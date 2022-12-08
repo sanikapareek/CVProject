@@ -20,6 +20,9 @@ from CameraCalibration import CameraCalibration
 from Thresholding import *
 from PerspectiveTransformation import *
 from LaneLines import *
+import tempfile
+import cv2
+import streamlit as st
 
 class FindLaneLines:
     """ This class is for parameter tunning.
@@ -57,16 +60,32 @@ class FindLaneLines:
         out_clip.write_videofile(output_path, audio=False)
 
 def main():
-    args = docopt(__doc__)
-    input = args['INPUT_PATH']
-    output = args['OUTPUT_PATH']
-
     findLaneLines = FindLaneLines()
-    if args['--video']:
-        findLaneLines.process_video(input, output)
-    else:
-        findLaneLines.process_image(input, output)
+    st.title('Lane Detection')
+    st.markdown('Upload a video and detect lane')
+    st.header('Input Video')
+    f = st.file_uploader("Upload file")
 
+    tfile = tempfile.NamedTemporaryFile(delete=False) 
+    tfile.write(f.read())
+
+    vf = cv2.VideoCapture(tfile.name)
+
+    stframe = st.empty()
+
+    while vf.isOpened():
+        ret, frame = vf.read()
+        # if frame is read correctly ret is True
+        if not ret:
+            print("Can't receive frame (stream end?). Exiting ...")
+            break
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        stframe.image(gray)
+    findLaneLines.process_video(f,"output.mp4")
+    video_file = open('output.mp4', 'rb')
+    video_bytes = video_file.read()
+
+st.video(video_bytes)
 
 if __name__ == "__main__":
     main()
