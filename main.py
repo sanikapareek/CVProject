@@ -60,7 +60,7 @@ class FindLaneLines:
         out_clip.write_videofile(output_path, audio=False)
 
 def main():
-    findLaneLines = FindLaneLines()
+    
     st.title('Lane Detection')
     st.markdown('Upload a video and detect lane')
     st.header('Input Video')
@@ -68,7 +68,7 @@ def main():
 
     tfile = tempfile.NamedTemporaryFile(delete=False) 
     tfile.write(f.read())
-
+    findLaneLines = FindLaneLines()
     vf = cv2.VideoCapture(tfile.name)
 
     stframe = st.empty()
